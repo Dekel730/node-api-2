@@ -10,6 +10,6 @@ const postScheme = mongoose.Schema({
 		ref: 'User',
 		required: true,
 	},
-});
+}, { timestamps: true });
 
 export default mongoose.model('Post', postScheme);

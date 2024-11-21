@@ -16,13 +16,13 @@ const authUser = asyncHandler(async (req, res, next) => {
             next();
         } catch(error){
             console.log(error);
-            res.status(401)
-            throw new Error('Not authorized');
+            res.status(400)
+            throw new Error('Token failed');
         }
     }
     if (!token) {
-        res.status(401);
-        throw new Error('Not authorized, no token provided');
+        res.status(400);
+        throw new Error('No token');
     }
 })
 
