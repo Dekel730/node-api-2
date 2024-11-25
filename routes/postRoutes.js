@@ -24,10 +24,11 @@ export default router;
  * @swagger
  * components:
  *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
+ *     jwtAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: Enter your JWT token directly in the `Authorization` header (without a `Bearer` prefix).
  *   schemas:
  *     Post:
  *       type: object
@@ -71,7 +72,7 @@ export default router;
  *     summary: Create a new post
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []
+ *       - jwtAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -274,7 +275,7 @@ export default router;
  *     summary: Update post by id
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []
+ *       - jwtAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -342,7 +343,7 @@ export default router;
  *     summary: Delete post by id
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []
+ *       - jwtAuth: []
  *     responses:
  *       200:
  *         description: The post with the provided ID

@@ -67,7 +67,7 @@ export default router
  *     summary: Create a new comment
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - jwtAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -198,7 +198,7 @@ export default router
  *     summary: Update a comment by ID
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - jwtAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -253,7 +253,7 @@ export default router
  *     summary: Delete a comment by ID
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - jwtAuth: []
  *     parameters:
  *       - in: path
  *         name: id
