@@ -1,4 +1,4 @@
-import express  from 'express';
+import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import colors from 'colors';
@@ -8,6 +8,7 @@ import userRoutes from './routes/userRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import swaggerUi from 'swagger-ui-express';
 import specs from './config/swagger.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -15,17 +16,16 @@ const app = express();
 
 connectDB();
 
-
 const PORT = process.env.PORT || 3000;
 
-
 app.use(express.json());
-app.use(express.urlencoded({ extended: false}));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}`)
-    console.log(`http://localhost:${PORT}/api-docs`)
-})
+	console.log(`server is running on port ${PORT}`);
+	console.log(`http://localhost:${PORT}/api-docs`);
+});
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 

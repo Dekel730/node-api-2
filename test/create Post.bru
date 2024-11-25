@@ -1,0 +1,21 @@
+meta {
+  name: create Post
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/api/post
+  body: json
+  auth: none
+}
+
+headers {
+  authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NDQ1NjA4M2M2NmY2MGU0OTg1NTc1NyIsImlhdCI6MTczMjUzMTgyNywiZXhwIjoxNzMyNTM1NDI3fQ.ufRmU7K7-AhSq9xcxzqGUF-g5Lr9yzyYOfEoLnPuoOU
+}
+
+body:json {
+  {
+    "message": "hey"
+  }
+}

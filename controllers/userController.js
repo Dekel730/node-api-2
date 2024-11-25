@@ -3,6 +3,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import Post from "../models/postModel.js";
 import Comment from "../models/commentModel.js";
+import jwt from "jsonwebtoken";
 
 
 const register = asyncHandler(async (req, res) => {
@@ -26,7 +27,12 @@ const register = asyncHandler(async (req, res) => {
     })
     res.json({
         success: true,
-        user: newUser
+        user: {
+            _id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
+            username: newUser.username
+        }
     })
 });
 
