@@ -72,4 +72,57 @@ const deleteUser = asyncHandler(async (req, res) => {
     })
 });
 
-export { register, updateUser, deleteUser };
+const login = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("Please provide email and password");
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        res.status(401);
+        throw new Error("Invalid credentials");
+    }
+    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+    res
+    .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+    .header('Authorization', accessToken);
+    res.json({
+        success: true,
+        user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            username: user.username
+        }
+    })
+});
+
+const refreshToken = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken) {
+        res.status(400);
+        throw new Error('No refresh token provided.');
+    }
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        const accessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.header('Authorization', accessToken);
+        res.json({
+            success: true
+        })
+    } catch (error) {
+        res.status(400);
+        throw new Error('Token failed');
+    }
+});
+
+export { register, updateUser, deleteUser, login, refreshToken };
