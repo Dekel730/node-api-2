@@ -89,9 +89,31 @@ export default router
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  *       400:
- *         description: Invalid input
+ *         description: Post not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Post not found"
  *       500:
- *         description: Internal server error
+ *         description: Some server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Server Error"
  *   get:
  *     summary: Get all comments for a post
  *     tags: [Comments]
@@ -112,7 +134,18 @@ export default router
  *               items:
  *                 $ref: '#/components/schemas/Comment'
  *       500:
- *         description: Internal server error
+ *         description: Some server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Server Error"
  */
 
 /**
@@ -136,9 +169,31 @@ export default router
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  *       404:
- *         description: Comment not found
+ *         description: Post not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Post not found"
  *       500:
- *         description: Internal server error
+ *         description: Some server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Server Error"
  *   put:
  *     summary: Update a comment by ID
  *     tags: [Comments]
@@ -169,9 +224,31 @@ export default router
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  *       404:
- *         description: Comment not found
+ *         description: Post not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Post not found"
  *       500:
- *         description: Internal server error
+ *         description: Some server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Server Error"
  *   delete:
  *     summary: Delete a comment by ID
  *     tags: [Comments]
@@ -186,7 +263,15 @@ export default router
  *         description: The ID of the comment to delete
  *     responses:
  *       200:
- *         description: Comment deleted successfully
+  *         description: The post with the provided ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *       404:
  *         description: Server not found
  *         content:
