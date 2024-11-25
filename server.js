@@ -14,17 +14,19 @@ dotenv.config();
 
 const app = express();
 
-connectDB();
-
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.listen(PORT, () => {
-	console.log(`server is running on port ${PORT}`);
-	console.log(`http://localhost:${PORT}/api-docs`);
+connectDB(() => {
+	if (process.env.NODE_ENV !== 'test') {
+		app.listen(PORT, () => {
+			console.log(`server is running on port ${PORT}`);
+			console.log(`http://localhost:${PORT}/api-docs`);
+		});
+	}
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -34,3 +36,5 @@ app.use('/api/user', userRoutes);
 app.use('/api/comment', commentRoutes);
 
 app.use(errorHandler);
+
+export default app;
