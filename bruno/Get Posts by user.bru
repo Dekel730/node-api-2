@@ -1,0 +1,15 @@
+meta {
+  name: Get Posts by user
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:3000/api/post?user=674456083c66f60e49855757
+  body: none
+  auth: none
+}
+
+params:query {
+  user: 674456083c66f60e49855757
+}

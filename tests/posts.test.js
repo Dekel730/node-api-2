@@ -21,6 +21,14 @@ describe('Posts API', () => {
 		userId = res.body.post.user;
 	});
 
+	it('should throw error creating post', async () => {
+		const res = await request(app)
+			.post('/api/post')
+			.set('Authorization', process.env.TEST_AUTH_TOKEN)
+			.send({});
+		expect(res.statusCode).toEqual(400);
+	});
+
 	it('should fetch posts by user', async () => {
 		const res = await request(app).get(`/api/post?user=${userId}`);
 		expect(res.statusCode).toEqual(200);
@@ -31,6 +39,13 @@ describe('Posts API', () => {
 		const res = await request(app).get(`/api/post/${postId}`);
 		expect(res.statusCode).toEqual(200);
 		expect(res.body.post).toHaveProperty('_id', postId);
+	});
+
+	it('should not found a post', async () => {
+		const res = await request(app).get(
+			`/api/post/674456083c66f60e49855757`
+		);
+		expect(res.statusCode).toEqual(404);
 	});
 
 	it('should fetch all posts', async () => {
@@ -48,6 +63,48 @@ describe('Posts API', () => {
 			});
 		expect(res.statusCode).toEqual(200);
 		expect(res.body.post).toHaveProperty('message', 'hey test updated');
+	});
+
+	it('should error updating - post not found', async () => {
+		const res = await request(app)
+			.put(`/api/post/674456083c66f60e49855757`)
+			.set('Authorization', process.env.TEST_AUTH_TOKEN)
+			.send({
+				message: 'hey test updated',
+			});
+		expect(res.statusCode).toEqual(404);
+	});
+
+	it('should error updating - message is required', async () => {
+		const res = await request(app)
+			.put(`/api/post/${postId}`)
+			.set('Authorization', process.env.TEST_AUTH_TOKEN)
+			.send({});
+		expect(res.statusCode).toEqual(400);
+	});
+
+	it('should error updating - Unauthorized', async () => {
+		const res = await request(app)
+			.put(`/api/post/${postId}`)
+			.set('Authorization', process.env.TEST_AUTH_TOKEN2)
+			.send({
+				message: 'hey test updated',
+			});
+		expect(res.statusCode).toEqual(401);
+	});
+
+	it('should error deleting a post - post not found', async () => {
+		const res = await request(app)
+			.delete(`/api/post/674456083c66f60e49855757`)
+			.set('Authorization', process.env.TEST_AUTH_TOKEN);
+		expect(res.statusCode).toEqual(404);
+	});
+
+	it('should error deleting a post - Unauthorized', async () => {
+		const res = await request(app)
+			.delete(`/api/post/${postId}`)
+			.set('Authorization', process.env.TEST_AUTH_TOKEN2);
+		expect(res.statusCode).toEqual(401);
 	});
 
 	it('should delete a post', async () => {
