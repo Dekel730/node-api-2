@@ -1,4 +1,5 @@
 import Comment from '../models/commentModel.js';
+import Post from '../models/postModel.js';
 import asyncHandler from "express-async-handler";
 
 const createComment = asyncHandler(async (req, res) => {
@@ -7,11 +8,17 @@ const createComment = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Please provide message and post");
     }
+    const postExists = await Post.findById(post);
+    if (!postExists) {
+        res.status(404);
+        throw new Error("Post not found");
+    }
     const newComment = await Comment.create({
         message,
         post,
         user: req.user._id
     })
+    res.status(201);
     res.json({
         success: true,
         comment: newComment
@@ -20,10 +27,6 @@ const createComment = asyncHandler(async (req, res) => {
 
 const getComment = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    if (!id) {
-        res.status(400);
-        throw new Error("Please provide comment id");
-    }
     const comment = await Comment.findById(id);
     if (!comment) {
         res.status(404);
@@ -46,10 +49,6 @@ const getCommentByPost = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    if (!id) {
-        res.status(400);
-        throw new Error("Please provide post id");
-    }
     const { message } = req.body;
     if (!message) {
         res.status(400);
@@ -74,10 +73,6 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    if (!id) {
-        res.status(400);
-        throw new Error("Please provide comment id");
-    }
     const comment = await Comment.findById(id);
     if (!comment) {
         res.status(404);
