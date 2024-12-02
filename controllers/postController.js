@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 
 const createPost = asyncHandler(async (req, res) => {
 	const { message } = req.body;
+	console.log(message);
 	if (!message) {
 		res.status(400);
 		throw new Error('Please provide message and sender');
@@ -28,10 +29,6 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 const getPostById = asyncHandler(async (req, res) => {
 	const { id } = req.params;
-	if (!id) {
-		res.status(400);
-		throw new Error('Please provide post id');
-	}
 	const post = await Post.findById(id);
 	if (!post) {
 		res.status(404);
@@ -54,10 +51,6 @@ const getPostByUser = asyncHandler(async (req, res) => {
 
 const updatePost = asyncHandler(async (req, res) => {
 	const { id } = req.params;
-	if (!id) {
-		res.status(400);
-		throw new Error('Please provide post id');
-	}
 	const { message } = req.body;
 	if (!message) {
 		res.status(400);
@@ -82,10 +75,6 @@ const updatePost = asyncHandler(async (req, res) => {
 
 const deletePost = asyncHandler(async (req, res) => {
 	const { id } = req.params;
-	if (!id) {
-		res.status(400);
-		throw new Error('Please provide post id');
-	}
 	const post = await Post.findById(id);
 	if (!post) {
 		res.status(404);

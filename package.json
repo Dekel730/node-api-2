@@ -6,6 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"test": "jest --detectOpenHandles --forceExit",
+		"test:coverage": "jest --detectOpenHandles --forceExit --coverage",
 		"dev": "nodemon server.js",
 		"start": "node server.js"
 	},
