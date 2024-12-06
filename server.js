@@ -7,7 +7,7 @@ import postRoutes from './routes/postRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import swaggerUi from 'swagger-ui-express';
-import specs from './config/swagger.js';
+import specs from './doc/swagger.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
