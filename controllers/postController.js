@@ -3,7 +3,6 @@ import asyncHandler from 'express-async-handler';
 
 const createPost = asyncHandler(async (req, res) => {
 	const { message } = req.body;
-	console.log(message);
 	if (!message) {
 		res.status(400);
 		throw new Error('Please provide message and sender');
