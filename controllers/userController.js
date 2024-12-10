@@ -5,7 +5,6 @@ import Post from "../models/postModel.js";
 import Comment from "../models/commentModel.js";
 import jwt from "jsonwebtoken";
 
-
 const register = asyncHandler(async (req, res) => {
     const { name, email, password, username } = req.body;
     if (!name || !email || !password || !username) {
@@ -23,17 +22,17 @@ const register = asyncHandler(async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        username
-    })
+        username,
+    });
     res.json({
         success: true,
         user: {
             _id: newUser._id,
             name: newUser.name,
             email: newUser.email,
-            username: newUser.username
-        }
-    })
+            username: newUser.username,
+        },
+    });
 });
 
 const updateUser = asyncHandler(async (req, res) => {
@@ -56,15 +55,19 @@ const updateUser = asyncHandler(async (req, res) => {
             throw new Error("Username already exists");
         }
     }
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, {
-        name,
-        email,
-        username
-    }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            name,
+            email,
+            username,
+        },
+        { new: true }
+    );
     res.json({
         success: true,
-        user: updatedUser
-    })
+        user: updatedUser,
+    });
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
@@ -74,8 +77,8 @@ const deleteUser = asyncHandler(async (req, res) => {
     promises.push(Comment.deleteMany({ user: req.user._id }));
     await Promise.all(promises);
     res.json({
-        success: true
-    })
+        success: true,
+    });
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -94,40 +97,49 @@ const login = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error("Invalid credentials");
     }
-    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+    });
+    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+    });
 
-    res
-    .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-    .header('Authorization', accessToken);
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        sameSite: "strict",
+    }).header("Authorization", accessToken);
     res.json({
         success: true,
         user: {
             _id: user._id,
             name: user.name,
             email: user.email,
-            username: user.username
-        }
-    })
+            username: user.username,
+        },
+    });
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies['refreshToken'];
+    const refreshToken = req.cookies["refreshToken"];
     if (!refreshToken) {
         res.status(400);
-        throw new Error('No refresh token provided.');
+        throw new Error("No refresh token provided.");
     }
     try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-        const accessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign(
+            { id: decoded.id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
 
-        res.header('Authorization', accessToken);
+        res.header("Authorization", accessToken);
         res.json({
-            success: true
-        })
+            success: true,
+        });
     } catch (error) {
         res.status(400);
-        throw new Error('Token failed');
+        throw new Error("Token failed");
     }
 });
 
