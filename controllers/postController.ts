@@ -1,7 +1,9 @@
-import Post from '../models/postModel.js';
+import { ObjectId } from 'mongoose';
+import Post from '../models/postModel';
 import asyncHandler from 'express-async-handler';
 
 const createPost = asyncHandler(async (req, res) => {
+	const user = req.user!;
 	const { message } = req.body;
 	if (!message) {
 		res.status(400);
@@ -9,7 +11,7 @@ const createPost = asyncHandler(async (req, res) => {
 	}
 	const newPost = await Post.create({
 		message,
-		user: req.user._id,
+		user: user._id,
 	});
 	res.status(201);
 	res.json({
@@ -49,6 +51,7 @@ const getPostByUser = asyncHandler(async (req, res) => {
 });
 
 const updatePost = asyncHandler(async (req, res) => {
+	const user = req.user!;
 	const { id } = req.params;
 	const { message } = req.body;
 	if (!message) {
@@ -60,7 +63,7 @@ const updatePost = asyncHandler(async (req, res) => {
 		res.status(404);
 		throw new Error('Post not found');
 	}
-	if (post.user.toString() !== req.user._id.toString()) {
+	if (post.user.toString() !== (user._id as ObjectId).toString()) {
 		res.status(401);
 		throw new Error('You are not authorized to update this post');
 	}
@@ -73,13 +76,14 @@ const updatePost = asyncHandler(async (req, res) => {
 });
 
 const deletePost = asyncHandler(async (req, res) => {
+	const user = req.user!;
 	const { id } = req.params;
 	const post = await Post.findById(id);
 	if (!post) {
 		res.status(404);
 		throw new Error('Post not found');
 	}
-	if (post.user.toString() !== req.user._id.toString()) {
+	if (post.user.toString() !== (user._id as ObjectId).toString()) {
 		res.status(401);
 		throw new Error('You are not authorized to delete this post');
 	}

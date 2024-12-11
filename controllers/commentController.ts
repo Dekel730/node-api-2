@@ -1,8 +1,10 @@
-import Comment from '../models/commentModel.js';
-import Post from '../models/postModel.js';
+import { ObjectId } from 'mongoose';
+import Comment from '../models/commentModel';
+import Post from '../models/postModel';
 import asyncHandler from "express-async-handler";
 
 const createComment = asyncHandler(async (req, res) => {
+    const user = req.user!;
     const { message, post } = req.body;
     if (!message || !post) {
         res.status(400);
@@ -16,7 +18,7 @@ const createComment = asyncHandler(async (req, res) => {
     const newComment = await Comment.create({
         message,
         post,
-        user: req.user._id
+        user: user._id
     })
     res.status(201);
     res.json({
@@ -48,6 +50,7 @@ const getCommentByPost = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
+    const user = req.user!;
     const { id } = req.params;
     const { message } = req.body;
     if (!message) {
@@ -59,7 +62,7 @@ const updateComment = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Comment not found");
     }
-    if (comment.user.toString() !== req.user._id.toString()) {
+    if (comment.user.toString() !== (user._id as ObjectId).toString()) {
         res.status(401);
         throw new Error("You are not authorized to update this comment");
     }
@@ -72,13 +75,14 @@ const updateComment = asyncHandler(async (req, res) => {
 });
 
 const deleteComment = asyncHandler(async (req, res) => {
+    const user = req.user!;
     const { id } = req.params;
     const comment = await Comment.findById(id);
     if (!comment) {
         res.status(404);
         throw new Error("Comment not found");
     }
-    if (comment.user.toString() !== req.user._id.toString()) {
+    if (comment.user.toString() !== (user._id as ObjectId).toString()) {
         res.status(401);
         throw new Error("You are not authorized to delete this comment");
     }

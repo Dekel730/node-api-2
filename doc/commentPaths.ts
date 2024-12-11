@@ -1,4 +1,4 @@
-import { errorHandler } from './components.js';
+import { errorHandler } from './components';
 
 const commentPaths = {
 	'/api/comment': {

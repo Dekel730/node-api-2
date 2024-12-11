@@ -1,9 +1,10 @@
 import request from "supertest";
-import app from "../server.js";
+import app from "../server";
+import { beforeAll, describe, expect, it } from "@jest/globals";
 
 process.env.NODE_ENV = "test";
 
-var accessToken, accessToken2;
+var accessToken: string, accessToken2: string;
 
 beforeAll(async () => {
     const res = await request(app).post("/api/user/login").send({
@@ -19,8 +20,8 @@ beforeAll(async () => {
 });
 
 describe("Posts API", () => {
-    let postId;
-    let userId;
+    let postId: string;
+    let userId: string;
 
     it("should create a new post", async () => {
         const res = await request(app)
