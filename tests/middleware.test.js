@@ -3,6 +3,16 @@ import app from '../server.js';
 
 process.env.NODE_ENV = 'test';
 
+var refreshToken;
+
+beforeAll(async () => {
+	const res = await request(app).post('/api/user/login').send({
+		email: process.env.TEST_USER_1,
+		password: process.env.TEST_USER_1_PASSWORD,
+	});
+	refreshToken = res.headers['set-cookie'][0];
+});
+
 describe('Middleware auth Test', () => {
 	it('should return 401 if no token provided', async () => {
 		const res = await request(app).post('/api/post').send({
@@ -14,7 +24,7 @@ describe('Middleware auth Test', () => {
 	it('should return 401 if access token expired or invalid and no refresh token', async () => {
 		const res = await request(app)
 			.post('/api/post')
-			.set('Authorization', '32801hrf0231nif09231fhji2n3f0in2')
+			.set('authorization', '32801hrf0231nif09231fhji2n3f0in2')
 			.send({
 				message: 'hey test',
 			});
@@ -26,7 +36,7 @@ describe('Middleware auth Test', () => {
 			'refreshToken=32801hrf0231nif09231fhji2n3f0in2; Path=/; HttpOnly; SameSite=Lax; Max-Age=0';
 		const res = await request(app)
 			.post('/api/post')
-			.set('Authorization', '32801hrf0231nif09231fhji2n3f0in2')
+			.set('authorization', '32801hrf0231nif09231fhji2n3f0in2')
 			.set('Cookie', cookie)
 			.send({
 				message: 'hey test',
@@ -37,8 +47,8 @@ describe('Middleware auth Test', () => {
 	it('should return 200 if access token expired or invalid and refresh token is valid -  sent new refresh token', async () => {
 		const res = await request(app)
 			.post('/api/post')
-			.set('Authorization', '32801hrf0231nif09231fhji2n3f0in2')
-			.set('Cookie', process.env.TEST_REFRESH_TOKEN)
+			.set('authorization', '32801hrf0231nif09231fhji2n3f0in2')
+			.set('Cookie', refreshToken)
 			.send({
 				message: 'test middleware',
 			});

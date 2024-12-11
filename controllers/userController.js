@@ -100,7 +100,7 @@ const login = asyncHandler(async (req, res) => {
     const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
     });
-    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET_REFRESH, {
         expiresIn: "30d",
     });
 
@@ -126,7 +126,7 @@ const refreshToken = asyncHandler(async (req, res) => {
         throw new Error("No refresh token provided.");
     }
     try {
-        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH);
         const accessToken = jwt.sign(
             { id: decoded.id },
             process.env.JWT_SECRET,
