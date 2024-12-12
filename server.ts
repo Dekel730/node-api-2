@@ -1,14 +1,15 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js';
+import connectDB from './config/db';
 import colors from 'colors';
-import { errorHandler } from './middleware/errorMiddleware.js';
-import postRoutes from './routes/postRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import commentRoutes from './routes/commentRoutes.js';
+import { errorHandler } from './middleware/errorMiddleware';
+import postRoutes from './routes/postRoutes';
+import userRoutes from './routes/userRoutes';
+import commentRoutes from './routes/commentRoutes';
 import swaggerUi from 'swagger-ui-express';
-import specs from './doc/swagger.js';
+import specs from './doc/swagger';
 import cookieParser from 'cookie-parser';
+import './types/types';
 
 dotenv.config();
 

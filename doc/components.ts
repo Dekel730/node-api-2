@@ -1,4 +1,4 @@
-export const errorHandler = (statusCode, description, errorMessage) => {
+export const errorHandler = (statusCode: number, description: string, errorMessage: string): Object => {
 	const error = {
 		[statusCode]: {
 			description: description,

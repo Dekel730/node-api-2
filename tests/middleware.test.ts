@@ -1,9 +1,10 @@
 import request from 'supertest';
-import app from '../server.js';
+import app from '../server';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 
 process.env.NODE_ENV = 'test';
 
-var refreshToken;
+var refreshToken: string;
 
 beforeAll(async () => {
 	const res = await request(app).post('/api/user/login').send({

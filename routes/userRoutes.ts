@@ -5,8 +5,8 @@ import {
 	deleteUser,
 	login,
 	refreshToken,
-} from '../controllers/userController.js';
-import { authUser } from '../middleware/authMiddleware.js';
+} from '../controllers/userController';
+import { authUser } from '../middleware/authMiddleware';
 
 const router = express.Router();
 

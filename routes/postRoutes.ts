@@ -6,8 +6,8 @@ import {
 	getAllPosts,
 	getPostById,
 	deletePost,
-} from '../controllers/postController.js';
-import { authUser } from '../middleware/authMiddleware.js';
+} from '../controllers/postController';
+import { authUser } from '../middleware/authMiddleware';
 
 const router = express.Router();
 

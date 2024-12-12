@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
-import User from '../models/userModel.js';
+import User from '../models/userModel';
+import { Request, Response, NextFunction } from 'express';
 
-const authUser = asyncHandler(async (req, res, next) => {
+const authUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 	const accessToken = req.headers['authorization'];
 	const refreshToken = req.cookies['refreshToken'];
 
@@ -12,7 +13,7 @@ const authUser = asyncHandler(async (req, res, next) => {
 	}
 
 	try {
-		const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+		const decoded = jwt.verify(accessToken!, process.env.JWT_SECRET!) as JwtPayload;
 		req.user = await User.findById(decoded.id).select('-password');
 		next();
 	} catch (error) {
@@ -24,11 +25,11 @@ const authUser = asyncHandler(async (req, res, next) => {
 		try {
 			const decoded = jwt.verify(
 				refreshToken,
-				process.env.JWT_SECRET_REFRESH
-			);
+				process.env.JWT_SECRET_REFRESH!
+			) as JwtPayload;
 			const accessToken = jwt.sign(
 				{ id: decoded.id },
-				process.env.JWT_SECRET,
+				process.env.JWT_SECRET!,
 				{ expiresIn: '1h' }
 			);
 

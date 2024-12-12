@@ -1,12 +1,13 @@
 import request from 'supertest';
-import app from '../server.js';
+import app from '../server';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 
 process.env.NODE_ENV = 'test';
 
 describe('user API', () => {
-	var userId;
-	var accessToken;
-	var refreshToken;
+	var userId: string;
+	var accessToken: string;
+	var refreshToken: string;
 
 	it('should register a new user', async () => {
 		const res = await request(app).post('/api/user/register').send({
