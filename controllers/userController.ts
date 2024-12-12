@@ -3,10 +3,16 @@ import User from '../models/userModel';
 import bcrypt from 'bcrypt';
 import Post from '../models/postModel';
 import Comment from '../models/commentModel';
-import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const register = asyncHandler(async (req, res) => {
-	const { name, email, password, username } = req.body;
+	const {
+		name,
+		email,
+		password,
+		username,
+	}: { name: string; email: string; password: string; username: string } =
+		req.body;
 	if (!name || !email || !password || !username) {
 		res.status(400);
 		throw new Error('Please provide name, email, password and username');
@@ -16,8 +22,8 @@ const register = asyncHandler(async (req, res) => {
 		res.status(400);
 		throw new Error('User already exists');
 	}
-	const salt = await bcrypt.genSalt(10);
-	const hashedPassword = await bcrypt.hash(password, salt);
+	const salt: string = await bcrypt.genSalt(10);
+	const hashedPassword: string = await bcrypt.hash(password, salt);
 	const newUser = await User.create({
 		name,
 		email,
@@ -36,8 +42,12 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-    const user = req.user!;
-	const { name, email, username } = req.body;
+	const user = req.user!;
+	const {
+		name,
+		email,
+		username,
+	}: { name: string; email: string; username: string } = req.body;
 	if (!name || !email || !username) {
 		res.status(400);
 		throw new Error('Please provide name, email and username');
@@ -72,7 +82,7 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-    const user = req.user!;
+	const user = req.user!;
 	let promises = [];
 	promises.push(User.findByIdAndDelete(user._id));
 	promises.push(Post.deleteMany({ user: user._id }));
@@ -84,7 +94,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-	const { email, password } = req.body;
+	const { email, password }: { email: string; password: string } = req.body;
 	if (!email || !password) {
 		res.status(400);
 		throw new Error('Please provide email and password');
@@ -94,15 +104,19 @@ const login = asyncHandler(async (req, res) => {
 		res.status(404);
 		throw new Error('User not found');
 	}
-	const isMatch = await bcrypt.compare(password, user.password);
+	const isMatch: boolean = await bcrypt.compare(password, user.password);
 	if (!isMatch) {
 		res.status(401);
 		throw new Error('Invalid credentials');
 	}
-	const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
-		expiresIn: '1h',
-	});
-	const refreshToken = jwt.sign(
+	const accessToken: string = jwt.sign(
+		{ id: user._id },
+		process.env.JWT_SECRET!,
+		{
+			expiresIn: '1h',
+		}
+	);
+	const refreshToken: string = jwt.sign(
 		{ id: user._id },
 		process.env.JWT_SECRET_REFRESH!,
 		{
@@ -126,7 +140,7 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-	const refreshToken = req.cookies['refreshToken'];
+	const refreshToken: string = req.cookies['refreshToken'];
 	if (!refreshToken) {
 		res.status(400);
 		throw new Error('No refresh token provided.');
@@ -136,7 +150,7 @@ const refreshToken = asyncHandler(async (req, res) => {
 			refreshToken,
 			process.env.JWT_SECRET_REFRESH!
 		) as JwtPayload;
-		const accessToken = jwt.sign(
+		const accessToken: string = jwt.sign(
 			{ id: decoded.id },
 			process.env.JWT_SECRET!,
 			{ expiresIn: '1h' }
