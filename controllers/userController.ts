@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import User from '../models/userModel';
+import User, { UserDocument } from '../models/userModel';
 import bcrypt from 'bcrypt';
 import Post from '../models/postModel';
 import Comment from '../models/commentModel';
@@ -17,7 +17,9 @@ const register = asyncHandler(async (req, res) => {
 		res.status(400);
 		throw new Error('Please provide name, email, password and username');
 	}
-	const userExists = await User.findOne({ $or: [{ email }, { username }] });
+	const userExists: UserDocument | null = await User.findOne({
+		$or: [{ email }, { username }],
+	});
 	if (userExists) {
 		res.status(400);
 		throw new Error('User already exists');
@@ -54,7 +56,7 @@ const updateUser = asyncHandler(async (req, res) => {
 		throw new Error('Please provide name, email and username');
 	}
 	if (email !== user.email) {
-		const userExists = await User.findOne({ email });
+		const userExists: UserDocument | null = await User.findOne({ email });
 		if (userExists) {
 			res.status(400);
 			throw new Error('User already exists');
@@ -67,7 +69,7 @@ const updateUser = asyncHandler(async (req, res) => {
 			throw new Error('Username already exists');
 		}
 	}
-	const updatedUser = await User.findByIdAndUpdate(
+	const updatedUser: UserDocument | null = await User.findByIdAndUpdate(
 		user._id,
 		{
 			name,
@@ -89,7 +91,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
 const deleteUser = asyncHandler(async (req, res) => {
 	const user = req.user!;
-	let promises = [];
+	let promises: Promise<any>[] = [];
 	promises.push(User.findByIdAndDelete(user._id));
 	promises.push(Post.deleteMany({ user: user._id }));
 	promises.push(Comment.deleteMany({ user: user._id }));
@@ -124,8 +126,9 @@ const login = asyncHandler(async (req, res) => {
 	);
 	const refreshToken: string = jwt.sign(
 		{ id: user._id },
-		process.env.JWT_SECRET_REFRESH!
+		process.env.JWT_SECRET_REFRESH!,
 	);
+
 	user.tokens.push(refreshToken);
 	await user.save();
 	res.json({
