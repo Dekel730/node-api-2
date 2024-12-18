@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import Post from '../models/postModel';
 import Comment from '../models/commentModel';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Request, Response } from 'express';
 
 const register = asyncHandler(async (req, res) => {
 	const {
@@ -126,7 +127,7 @@ const login = asyncHandler(async (req, res) => {
 	);
 	const refreshToken: string = jwt.sign(
 		{ id: user._id },
-		process.env.JWT_SECRET_REFRESH!,
+		process.env.JWT_SECRET_REFRESH!
 	);
 
 	user.tokens.push(refreshToken);
@@ -143,6 +144,44 @@ const login = asyncHandler(async (req, res) => {
 		refreshToken,
 	});
 });
+
+const logout = asyncHandler(
+	async (req: Request, res: Response): Promise<void> => {
+		const authHeader = req.headers['authorization'];
+		const refreshToken = authHeader && authHeader.split(' ')[1];
+		if (!refreshToken) {
+			res.status(400);
+			throw new Error('No refresh token provided.');
+		}
+		let decoded;
+		try {
+			decoded = jwt.verify(
+				refreshToken,
+				process.env.JWT_SECRET_REFRESH!
+			) as JwtPayload;
+		} catch (error) {
+			res.status(400);
+			throw new Error('Token failed');
+		}
+		const user = await User.findById(decoded.id);
+		if (!user) {
+			res.status(404);
+			throw new Error('User not found');
+		}
+		if (!user.tokens.includes(refreshToken)) {
+			user.tokens = [];
+			await user.save();
+			res.status(401);
+			throw new Error('Invalid token');
+		}
+		user.tokens = user.tokens.filter((t) => t !== refreshToken);
+		await user.save();
+		res.json({
+			success: true,
+			message: 'Logged out successfully',
+		});
+	}
+);
 
 const refreshToken = asyncHandler(async (req, res) => {
 	const authHeader = req.headers['authorization'];
@@ -183,10 +222,8 @@ const refreshToken = asyncHandler(async (req, res) => {
 		{ id: decoded.id },
 		process.env.JWT_SECRET_REFRESH!
 	);
-
 	user.tokens[user.tokens.indexOf(refreshToken)] = newRefreshToken;
 	await user.save();
-
 	res.json({
 		success: true,
 		accessToken,
@@ -194,4 +231,4 @@ const refreshToken = asyncHandler(async (req, res) => {
 	});
 });
 
-export { register, updateUser, deleteUser, login, refreshToken };
+export { register, updateUser, deleteUser, login, refreshToken, logout };

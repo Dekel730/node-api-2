@@ -249,15 +249,6 @@ const userPaths = {
 			responses: {
 				200: {
 					description: 'User successfully logged in',
-					headers: {
-						Authorization: {
-							description:
-								'Token to be used for authenticated requests',
-							schema: {
-								type: 'string',
-							},
-						},
-					},
 					content: {
 						'application/json': {
 							schema: {
@@ -297,6 +288,16 @@ const userPaths = {
 											username: 'johndoe',
 										},
 									},
+									accessToken: {
+										type: 'string',
+										description:
+											'Access token for authenticating',
+									},
+									refreshToken: {
+										type: 'string',
+										description:
+											'Refresh token for getting new access token',
+									},
 								},
 							},
 						},
@@ -316,6 +317,51 @@ const userPaths = {
 			},
 		},
 	},
+	'/api/user/logout': {
+		post: {
+			summary: 'Logout user',
+			tags: ['Users'],
+			security: [
+				{
+					jwtAuth: [],
+				},
+			],
+			responses: {
+				200: {
+					description: 'User successfully logged out',
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									success: {
+										type: 'boolean',
+										example: true,
+									},
+									message: {
+										type: 'string',
+										example: 'Logged out successfully',
+									},
+								},
+							},
+						},
+					},
+				},
+				...errorHandler(
+					400,
+					'Invalid input',
+					'Please provide email and password'
+				),
+				...errorHandler(
+					401,
+					'Unauthorized access',
+					'Invalid credentials'
+				),
+				...errorHandler(404, 'Not Found', 'User not found'),
+				...errorHandler(500, 'Some server error', 'Server Error'),
+			},
+		},
+	},
 	'/api/user/refresh': {
 		post: {
 			summary: 'Refresh token',
@@ -328,17 +374,6 @@ const userPaths = {
 			responses: {
 				200: {
 					description: 'The token was successfully refreshed',
-					headers: {
-						Authorization: {
-							description:
-								'JWT token to be used for authenticated requests',
-							schema: {
-								type: 'string',
-								example:
-									'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVJ9...',
-							},
-						},
-					},
 					content: {
 						'application/json': {
 							schema: {
@@ -347,6 +382,16 @@ const userPaths = {
 									success: {
 										type: 'boolean',
 										example: true,
+									},
+									accessToken: {
+										type: 'string',
+										description:
+											'Access token for authenticating',
+									},
+									refreshToken: {
+										type: 'string',
+										description:
+											'Refresh token for getting new access token',
 									},
 								},
 							},
