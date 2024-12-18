@@ -320,17 +320,9 @@ const userPaths = {
 		post: {
 			summary: 'Refresh token',
 			tags: ['Users'],
-			parameters: [
+			security: [
 				{
-					in: 'cookie',
-					name: 'refreshToken',
-					required: true,
-					schema: {
-						type: 'string',
-						description:
-							'Refresh token stored as an HTTP-only cookie',
-						example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-					},
+					jwtAuth: [],
 				},
 			],
 			responses: {
@@ -343,7 +335,7 @@ const userPaths = {
 							schema: {
 								type: 'string',
 								example:
-									'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+									'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVJ9...',
 							},
 						},
 					},
@@ -362,6 +354,7 @@ const userPaths = {
 					},
 				},
 				...errorHandler(401, 'Invalid token', 'Token failed'),
+				...errorHandler(404, 'Not Found', 'User Not Found'),
 				...errorHandler(500, 'Some server error', 'Server Error'),
 			},
 		},
