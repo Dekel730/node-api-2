@@ -1,4 +1,8 @@
-export const errorHandler = (statusCode: number, description: string, errorMessage: string): Object => {
+export const errorHandler = (
+	statusCode: number,
+	description: string,
+	errorMessage: string
+): Object => {
 	const error = {
 		[statusCode]: {
 			description: description,
@@ -31,7 +35,7 @@ const components = {
 			in: 'header',
 			name: 'Authorization',
 			description:
-				'Enter your JWT token directly in the `Authorization` header (without a `Bearer` prefix).',
+				'Enter your JWT token directly in the `Authorization` header (with a `Bearer` prefix).',
 		},
 	},
 	schemas: {
