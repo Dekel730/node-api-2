@@ -1,14 +1,23 @@
+import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import app from '../server';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 
 process.env.NODE_ENV = 'test';
 
-describe('user API', () => {
-	var userId: string;
-	var accessToken: string;
-	var refreshToken: string;
+var userId: string;
+var accessToken: string;
+var refreshToken: string, invalidUserToken: string;
 
+beforeAll(async () => {
+	const randomMongoId = '60b0e6f4c9f8c72b1c1b3e7b';
+	invalidUserToken = jwt.sign(
+		{ id: randomMongoId },
+		process.env.JWT_SECRET_REFRESH!
+	);
+});
+
+describe('user API', () => {
 	it('should register a new user', async () => {
 		const res = await request(app).post('/api/user/register').send({
 			name: 'Test User',
@@ -16,7 +25,7 @@ describe('user API', () => {
 			password: 'password123',
 			username: 'testuser',
 		});
-		expect(res.statusCode).toEqual(200);
+		expect(res.statusCode).toEqual(201);
 		expect(res.body).toHaveProperty('success', true);
 		expect(res.body.user).toHaveProperty('_id');
 		expect(res.body.user).toHaveProperty('name', 'Test User');
@@ -59,14 +68,14 @@ describe('user API', () => {
 		expect(res.body.user).toHaveProperty('name', 'Test User');
 		expect(res.body.user).toHaveProperty('email', 'testuser@example.com');
 		expect(res.body.user).toHaveProperty('username', 'testuser');
-		accessToken = res.headers.authorization;
-		refreshToken = res.headers['set-cookie'][0];
+		accessToken = res.body.accessToken;
+		refreshToken = res.body.refreshToken;
 	});
 
 	it('should return 400 if any required field is missing', async () => {
 		const res = await request(app)
 			.put('/api/user/')
-			.set('authorization', accessToken)
+			.set('authorization', `Bearer ${accessToken}`)
 			.send({
 				name: 'Test User',
 				password: 'password123',
@@ -82,7 +91,7 @@ describe('user API', () => {
 	it('should return 400 if email is already in use', async () => {
 		const res = await request(app)
 			.put('/api/user/')
-			.set('authorization', accessToken)
+			.set('authorization', `Bearer ${accessToken}`)
 			.send({
 				name: 'Test User',
 				email: 'omerg863@gmail.com',
@@ -96,7 +105,7 @@ describe('user API', () => {
 	it('should return 400 if email is already in use', async () => {
 		const res = await request(app)
 			.put('/api/user/')
-			.set('authorization', accessToken)
+			.set('authorization', `Bearer ${accessToken}`)
 			.send({
 				name: 'Test User',
 				email: 'testuser@example.com',
@@ -110,7 +119,7 @@ describe('user API', () => {
 	it('should update the user', async () => {
 		const res = await request(app)
 			.put('/api/user/')
-			.set('authorization', accessToken)
+			.set('authorization', `Bearer ${accessToken}`)
 			.send({
 				name: 'Test User updated',
 				username: 'testuser',
@@ -164,27 +173,45 @@ describe('user API', () => {
 
 		const res = await request(app)
 			.post('/api/user/refresh')
-			.set('Cookie', `refreshToken=${invalidRefreshToken}`)
+			.set('Authorization', `Bearer ${invalidRefreshToken}`)
 			.expect(400);
 
 		expect(res.body.message).toBe('Token failed');
 	});
 
-	it('should return access token if valid refresh token is provided in cookies', async () => {
+	it('should return 404 if user not found', async () => {
 		const res = await request(app)
 			.post('/api/user/refresh')
-			.set('Cookie', refreshToken)
+			.set('Authorization', `Bearer ${invalidUserToken}`);
+
+		expect(res.statusCode).toEqual(404);
+	});
+
+	it('should return access token if valid refresh token is provided', async () => {
+		const res = await request(app)
+			.post('/api/user/refresh')
+			.set('Authorization', `Bearer ${refreshToken}`)
 			.send({});
 
 		expect(res.statusCode).toEqual(200);
 		expect(res.body.success).toBe(true);
-		expect(res.headers['authorization']).toBeDefined();
+		expect(res.body).toHaveProperty('accessToken');
+		expect(res.body).toHaveProperty('refreshToken');
+	});
+
+	it('should return 401 if refresh token expired', async () => {
+		const res = await request(app)
+			.post('/api/user/refresh')
+			.set('Authorization', `Bearer ${refreshToken}`)
+			.send({});
+
+		expect(res.statusCode).toEqual(401);
 	});
 
 	it('should delete a user', async () => {
 		const res = await request(app)
 			.delete(`/api/user/`)
-			.set('authorization', accessToken);
+			.set('authorization', `Bearer ${accessToken}`);
 		expect(res.statusCode).toEqual(200);
 		expect(res.body).toHaveProperty('success', true);
 	});
