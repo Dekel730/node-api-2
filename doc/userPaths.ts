@@ -249,15 +249,6 @@ const userPaths = {
 			responses: {
 				200: {
 					description: 'User successfully logged in',
-					headers: {
-						Authorization: {
-							description:
-								'Token to be used for authenticated requests',
-							schema: {
-								type: 'string',
-							},
-						},
-					},
 					content: {
 						'application/json': {
 							schema: {
@@ -297,6 +288,16 @@ const userPaths = {
 											username: 'johndoe',
 										},
 									},
+									accessToken: {
+										type: 'string',
+										description:
+											'Access token for authenticating',
+									},
+									refreshToken: {
+										type: 'string',
+										description:
+											'Refresh token for getting new access token',
+									},
 								},
 							},
 						},
@@ -316,37 +317,18 @@ const userPaths = {
 			},
 		},
 	},
-	'/api/user/refresh': {
+	'/api/user/logout': {
 		post: {
-			summary: 'Refresh token',
+			summary: 'Logout user',
 			tags: ['Users'],
-			parameters: [
+			security: [
 				{
-					in: 'cookie',
-					name: 'refreshToken',
-					required: true,
-					schema: {
-						type: 'string',
-						description:
-							'Refresh token stored as an HTTP-only cookie',
-						example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-					},
+					jwtAuth: [],
 				},
 			],
 			responses: {
 				200: {
-					description: 'The token was successfully refreshed',
-					headers: {
-						Authorization: {
-							description:
-								'JWT token to be used for authenticated requests',
-							schema: {
-								type: 'string',
-								example:
-									'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-							},
-						},
-					},
+					description: 'User successfully logged out',
 					content: {
 						'application/json': {
 							schema: {
@@ -356,12 +338,68 @@ const userPaths = {
 										type: 'boolean',
 										example: true,
 									},
+									message: {
+										type: 'string',
+										example: 'Logged out successfully',
+									},
+								},
+							},
+						},
+					},
+				},
+				...errorHandler(
+					400,
+					'Invalid input',
+					'Please provide email and password'
+				),
+				...errorHandler(
+					401,
+					'Unauthorized access',
+					'Invalid credentials'
+				),
+				...errorHandler(404, 'Not Found', 'User not found'),
+				...errorHandler(500, 'Some server error', 'Server Error'),
+			},
+		},
+	},
+	'/api/user/refresh': {
+		post: {
+			summary: 'Refresh token',
+			tags: ['Users'],
+			security: [
+				{
+					jwtAuth: [],
+				},
+			],
+			responses: {
+				200: {
+					description: 'The token was successfully refreshed',
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									success: {
+										type: 'boolean',
+										example: true,
+									},
+									accessToken: {
+										type: 'string',
+										description:
+											'Access token for authenticating',
+									},
+									refreshToken: {
+										type: 'string',
+										description:
+											'Refresh token for getting new access token',
+									},
 								},
 							},
 						},
 					},
 				},
 				...errorHandler(401, 'Invalid token', 'Token failed'),
+				...errorHandler(404, 'Not Found', 'User Not Found'),
 				...errorHandler(500, 'Some server error', 'Server Error'),
 			},
 		},
